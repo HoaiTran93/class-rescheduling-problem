@@ -14,6 +14,7 @@ class SimulatedAnnealingAlgorithm():
         self.temp = initTemp
         self.finalTemp = finalTemp
         self.tempMin = 1
+        self.currentPriority = 0
         self.earlyStopCounters = 0
         
     
@@ -89,17 +90,25 @@ class SimulatedAnnealingAlgorithm():
         print('currentState:\n', self.currentState)
         print('currentState_PD:\n', parsePD(self.currentState, self.priorityMatrix))
     
-    def earlyStopFn(self, temp, earlyStopCounters):
+    def earlyStopFn(self, temp, newPriority):
         print('earlyStopFn check')
-        if earlyStopCounters == 5:
-            print('self.earlyStopCounters == 5')
-            return True
-        elif temp < self.tempMin:
+
+        if newPriority == self.currentPriority:
+            self.earlyStopCounters += 1
+            print('earlyStopCounters += 1')
+            if self.earlyStopCounters == 10:
+                print('reach 10 times of same priority')
+                return True
+        else:
+            print('update self.currentPriority')
+            self.currentPriority = newPriority
+
+        if temp < self.tempMin:
             print('temp < self.tempMin')
             return True
-        else:
-            print('check fail')
-            return False
+        
+        print('no earlyStopFn match!!')
+        return False
 
     def logFn(self, epoch, neighboor, priority, avgLoss, temp):
         print('==============logFn==================')
@@ -116,7 +125,6 @@ class SimulatedAnnealingAlgorithm():
             print('temp run: ', self.temp)
             totalLoss = 0.0
             cnt = 0
-            self.earlyStopCounters = 0
             for nextNeighbor in self.getNeighborsList():
                 print('neighboor list: \n', self.getNeighborsList())
                 print('nextNeighbor:', nextNeighbor)
@@ -140,8 +148,6 @@ class SimulatedAnnealingAlgorithm():
                         print('prob > random')
                         self.updateCurrentState(nxtState, nextNeighbor)
                         break
-                    else:
-                        self.earlyStopCounters += 1
                     totalLoss += loss
                     cnt += 1
             
@@ -151,7 +157,7 @@ class SimulatedAnnealingAlgorithm():
             
             self.logFn(i, nextNeighbor, object_function(parsePD(self.currentState, self.priorityMatrix)), avgLoss, self.temp)
 
-            if self.earlyStopFn(self.temp, self.earlyStopCounters):
+            if self.earlyStopFn(self.temp, object_function(parsePD(self.currentState, self.priorityMatrix))):
                 return
             
             self.updateTemp(epochs)

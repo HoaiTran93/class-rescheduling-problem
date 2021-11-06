@@ -20,8 +20,12 @@ class SimulatedAnnealingAlgorithm():
     
     def updateTemp(self, epochs):
         print('updateTemp')
+        print('log(self.temp):',log(self.temp))
+        print('epochs: ',epochs)
+        print('log(self.finalTemp)', log(self.finalTemp))
         alpha = 1 - (log(self.temp) - log(self.finalTemp))/epochs
         self.temp *= alpha
+        print('alpha: ',alpha)
         print('temp:', self.temp)
     
     def updateCurrentNeighbor(self, nextNeighbor):
@@ -110,11 +114,12 @@ class SimulatedAnnealingAlgorithm():
         print('no earlyStopFn match!!')
         return False
 
-    def logFn(self, epoch, neighboor, priority, temp):
+    def logFn(self, epoch, neighboor, priority, temp, num_class):
         print('==============logFn==================')
         print('epoch: ', epoch)
         print('neighboor: ', neighboor)
         print('priority: ', priority)
+        print('num_class: ',num_class)
         print('temp: ', temp)
         print('================================')
 
@@ -124,6 +129,7 @@ class SimulatedAnnealingAlgorithm():
             print('temp run: ', self.temp)
             cnt = 0
             neighborsList = self.getNeighborsList()
+            neighborsList = neighborsList[:-1] #remove itself
             for nextNeighbor in neighborsList:
                 if cnt == len(neighborsList):
                     print('No candidate in all of neighbors!!!!')
@@ -152,14 +158,10 @@ class SimulatedAnnealingAlgorithm():
                         break
                     cnt += 1
             
-            self.logFn(i, nextNeighbor, object_function(parsePD(self.currentState, self.priorityMatrix)), self.temp)
+            self.logFn(i, nextNeighbor, object_function(parsePD(self.currentState, self.priorityMatrix)), self.temp, self.getTotalClass(self.currentState))
 
             if self.earlyStopFn(self.temp, object_function(parsePD(self.currentState, self.priorityMatrix))):
                 return
             
             self.updateTemp(epochs)
             print('==endfor==')
-
-
-
-        

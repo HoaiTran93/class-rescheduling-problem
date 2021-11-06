@@ -110,12 +110,11 @@ class SimulatedAnnealingAlgorithm():
         print('no earlyStopFn match!!')
         return False
 
-    def logFn(self, epoch, neighboor, priority, avgLoss, temp):
+    def logFn(self, epoch, neighboor, priority, temp):
         print('==============logFn==================')
         print('epoch: ', epoch)
         print('neighboor: ', neighboor)
         print('priority: ', priority)
-        print('avg loss: ', avgLoss)
         print('temp: ', temp)
         print('================================')
 
@@ -123,10 +122,13 @@ class SimulatedAnnealingAlgorithm():
         for i in range(epochs):
             print('===for epoch i: {0}==='.format(i))
             print('temp run: ', self.temp)
-            totalLoss = 0.0
             cnt = 0
-            for nextNeighbor in self.getNeighborsList():
-                print('neighboor list: \n', self.getNeighborsList())
+            neighborsList = self.getNeighborsList()
+            for nextNeighbor in neighborsList:
+                if cnt == len(neighborsList):
+                    print('No candidate in all of neighbors!!!!')
+                    return
+                print('neighboor list: \n', neighborsList)
                 print('nextNeighbor:', nextNeighbor)
                 recentState = self.currentState
                 print('recentState:\n',recentState)
@@ -134,12 +136,12 @@ class SimulatedAnnealingAlgorithm():
                 print('nxtState:\n',nxtState)
                 loss = self.lossFn(recentState, nxtState)
                 print('loss:{:.10f}'.format(loss))
-                if loss < 0:
-                    print('loss < 0')
+                if loss <= 0:
+                    print('loss <= 0')
                     self.updateCurrentState(nxtState, nextNeighbor)
                     break
                 else:
-                    print('loss >= 0')
+                    print('loss > 0')
                     prob = exp(-(loss/(self.temp + sys.float_info.epsilon)))
                     print('prob:',prob)
                     value_random = random()
@@ -148,14 +150,9 @@ class SimulatedAnnealingAlgorithm():
                         print('prob > random')
                         self.updateCurrentState(nxtState, nextNeighbor)
                         break
-                    totalLoss += loss
                     cnt += 1
             
-            avgLoss = -1.0
-            if cnt > 0:
-                avgLoss = totalLoss / cnt
-            
-            self.logFn(i, nextNeighbor, object_function(parsePD(self.currentState, self.priorityMatrix)), avgLoss, self.temp)
+            self.logFn(i, nextNeighbor, object_function(parsePD(self.currentState, self.priorityMatrix)), self.temp)
 
             if self.earlyStopFn(self.temp, object_function(parsePD(self.currentState, self.priorityMatrix))):
                 return

@@ -23,9 +23,9 @@ class SimulatedAnnealingAlgorithm():
         self.temp *= alpha
         print('temp:', self.temp)
     
-    def updateCurrentNeighbor(self):
-        self.neighboors[1] += 1
-        if self.neighboors[1] >= len(self.neighboors):
+    def updateCurrentNeighbor(self, nextNeighbor):
+        self.neighboors[1] = self.neighboors[0].index(nextNeighbor) + 1
+        if self.neighboors[1] >= len(self.neighboors[0]):
             self.neighboors[1] = 0
 
     def getNeighborsList(self):
@@ -34,9 +34,9 @@ class SimulatedAnnealingAlgorithm():
         for index_1 in range(cur_pos, len(self.neighboors[0])):
             neighboorList.append(self.neighboors[0][index_1])
         print('cur_pos:',cur_pos)
-        print('self.neighboors[0]:',self.neighboors[0])
+        # print('self.neighboors[0]:',self.neighboors[0])
         for index_2 in range(0, cur_pos):
-            print('index_2:',index_2)
+            # print('index_2:',index_2)
             neighboorList.append(self.neighboors[0][index_2])
         return neighboorList
 
@@ -44,27 +44,47 @@ class SimulatedAnnealingAlgorithm():
         tmpValue = state.drop(columns='Max_Classes')
         return tmpValue.values.sum()
 
+    # def lossFn(self,currentState, nextState):
+    #     print('lossFn called')
+    #     priority_value_currentState = object_function(parsePD(currentState, self.priorityMatrix))
+    #     priority_value_nextState = object_function(parsePD(nextState, self.priorityMatrix))
+
+    #     print('priority_value_currentState:\n', parsePD(currentState, self.priorityMatrix))
+    #     print('priority_value_nextState:\n', parsePD(nextState, self.priorityMatrix))
+
+    #     loss = priority_value_nextState - priority_value_currentState
+    #     if self.getTotalClass(nextState) < self.getTotalClass(currentState): # decrease class to decrease priority
+    #         print('detect decrease num class!!!!')
+    #         loss += 999
+    #     return loss
+
     def lossFn(self,currentState, nextState):
         print('lossFn called')
-        priority_value_currentState = object_function(parsePD(currentState, self.priorityMatrix))
-        priority_value_nextState = object_function(parsePD(nextState, self.priorityMatrix))
-
-        print('priority_value_currentState:\n', parsePD(currentState, self.priorityMatrix))
-        print('priority_value_nextState:\n', parsePD(nextState, self.priorityMatrix))
-
-        loss = priority_value_nextState - priority_value_currentState
-        if self.getTotalClass(nextState) < self.getTotalClass(currentState): # decrease class to decrease priority
+        loss = 0
+        if self.getTotalClass(nextState) < self.getTotalClass(currentState): # decrease class: reject with any priority
             print('detect decrease num class!!!!')
             loss += 999
+        elif self.getTotalClass(nextState) == self.getTotalClass(currentState): #same class: select if lower priority
+            print('detect same num class!!!!')
+            priority_value_currentState = object_function(parsePD(currentState, self.priorityMatrix))
+            priority_value_nextState = object_function(parsePD(nextState, self.priorityMatrix))
+
+            print('priority_value_currentState:\n', parsePD(currentState, self.priorityMatrix))
+            print('priority_value_nextState:\n', parsePD(nextState, self.priorityMatrix))
+
+            loss = priority_value_nextState - priority_value_currentState
+        else: # increase class:select with any priority
+            print('detect increase num class!!!!')
+            loss -= 999
         return loss
 
     def getNextState(self, nextNeighbor):
         handler = Assginments(self.priorityMatrix, self.currentState)
         return handler.execute(nextNeighbor[0], nextNeighbor[1])
     
-    def updateCurrentState(self, state):
+    def updateCurrentState(self, state, nextNeighbor):
         print('updateCurrentState')
-        self.updateCurrentNeighbor()
+        self.updateCurrentNeighbor(nextNeighbor)
         self.currentState = state
         print('currentState:\n', self.currentState)
         print('currentState_PD:\n', parsePD(self.currentState, self.priorityMatrix))
@@ -92,8 +112,7 @@ class SimulatedAnnealingAlgorithm():
 
     def start(self, epochs):
         for i in range(epochs):
-            print('===for epoch===')
-            print('epoch run: ', i)
+            print('===for epoch i: {0}==='.format(i))
             print('temp run: ', self.temp)
             totalLoss = 0.0
             cnt = 0
@@ -109,7 +128,7 @@ class SimulatedAnnealingAlgorithm():
                 print('loss:{:.10f}'.format(loss))
                 if loss < 0:
                     print('loss < 0')
-                    self.updateCurrentState(nxtState)
+                    self.updateCurrentState(nxtState, nextNeighbor)
                     break
                 else:
                     print('loss >= 0')
@@ -119,7 +138,7 @@ class SimulatedAnnealingAlgorithm():
                     print('value_random:',value_random)
                     if prob >= value_random:
                         print('prob > random')
-                        self.updateCurrentState(nxtState)
+                        self.updateCurrentState(nxtState, nextNeighbor)
                         break
                     else:
                         self.earlyStopCounters += 1

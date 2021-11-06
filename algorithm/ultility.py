@@ -70,7 +70,13 @@ def get_neighbors(course, registration, teacher):
     for classID in priority_class:
         for tc in registration.columns.tolist():
             select_TC = []
-            if registration.loc[classID,tc] <= registration.loc[classID,:].mean():
+            #pick TC has low priority
+            # if registration.loc[classID,tc] <= registration.loc[classID,:].mean():
+            #     select_TC.append(classID)
+            #     select_TC.append(tc)
+
+            #pick all TCs have priority of class
+            if registration.loc[classID,tc] != 999 and not np.isnan(registration.loc[classID,tc]):
                 select_TC.append(classID)
                 select_TC.append(tc)
             if len(select_TC) > 0:

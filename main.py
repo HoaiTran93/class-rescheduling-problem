@@ -8,9 +8,9 @@ def main():
     print("Start!!!")
 
     dataPath = sys.argv[1]
-    couse_path = dataPath + '/Courses-30-30-174418.csv'
-    teacher_path = dataPath + '/Teachers-30-30-174418.csv'
-    register_path = dataPath + '/Registrations-30-30-174418.csv'
+    couse_path = dataPath + '/Courses-50-15-174656.csv'
+    teacher_path = dataPath + '/Teachers-50-15-174656.csv'
+    register_path = dataPath + '/Registrations-50-15-174656.csv'
 
     course = pd.read_csv(couse_path)
     registration = pd.read_csv(register_path)
@@ -50,7 +50,8 @@ def main():
     #phase 2
     print('**************PHASE 2*****************')
     sa = SimulatedAnnealingAlgorithm(decision_matrix, tuple_neighbors, priority_matrix)
-    sa.start(500)
+    solution = sa.start(500)
+    sa.toString(solution)
     print("End!!!")
 
 if __name__ == "__main__":

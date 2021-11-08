@@ -101,3 +101,14 @@ class Assginments():
             self.housekeeping()
 
         return self.decision_matrix
+
+    def getTotalClass(self, decision_matrix):
+        tmpValue = decision_matrix.drop(columns='Max_Classes')
+        return tmpValue.values.sum()
+
+    def isBestSolution(self, classToBeOpen):
+        if self.getTotalClass(self.decision_matrix) == classToBeOpen:
+            return True
+        else:
+            return False
+

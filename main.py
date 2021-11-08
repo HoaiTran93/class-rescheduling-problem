@@ -2,15 +2,15 @@ import sys
 import numpy as np
 import pandas as pd
 from preprocessing import MatrixPriority
-from algorithm import Assginments, SimulatedAnnealingAlgorithm, object_function, parsePD, get_neighbors
+from algorithm import Hungarian, Assginments, SimulatedAnnealingAlgorithm, object_function, parsePD, get_neighbors
 
 def main():
     print("Start!!!")
 
     dataPath = sys.argv[1]
-    couse_path = dataPath + '/Course_1.csv'
-    teacher_path = dataPath + '/Teacher_1.csv'
-    register_path = dataPath + '/Registration_1.csv'
+    couse_path = dataPath + '/Courses-30-30-174418.csv'
+    teacher_path = dataPath + '/Teachers-30-30-174418.csv'
+    register_path = dataPath + '/Registrations-30-30-174418.csv'
 
     course = pd.read_csv(couse_path)
     registration = pd.read_csv(register_path)

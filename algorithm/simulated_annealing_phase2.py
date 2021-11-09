@@ -157,11 +157,15 @@ class SimulatedAnnealingAlgorithm():
         print('Class_PD:\n', parsePD(self.currentState, self.priorityMatrix))
         print('================================')
 
+    def getBasicClassToBeOpend(self, course):
+        num_class = course['Basic']*course['No. Classes']
+        return num_class.sum()
+
     def toString(self, course, state):
         print('==============Final Result==================')
         print('priority: ', object_function(parsePD(state, self.priorityMatrix)))
         print('num_class: ',self.getTotalClass(state))
-        print('num_class basic:', self.getBasicClass(course, parsePD(state, self.priorityMatrix)))
+        print('num_class basic: {:.1f}/{:.1f}'.format(self.getBasicClass(course, parsePD(state, self.priorityMatrix)), self.getBasicClassToBeOpend(course)))
         print('Class_PD:\n', parsePD(state, self.priorityMatrix))
         print('================================')
 

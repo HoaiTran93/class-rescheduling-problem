@@ -7,16 +7,16 @@ from algorithm import Assginments
 from .ultility import object_function, parsePD
 
 class SimulatedAnnealingAlgorithm():
-    def __init__(self, currentState, neighboors, priorityMatrix, initTemp=100.0, finalTemp=1.0):
+    def __init__(self, currentState, neighboors, priorityMatrix, initTemp=100.0, finalTemp=0.01):
         self.currentState = currentState #decision matrix of S0
         self.neighboors = neighboors
         self.priorityMatrix = priorityMatrix
         self.temp = initTemp
         self.finalTemp = finalTemp
-        self.tempMin = 1
         self.currentPriority = 0
         self.earlyStopCounters = 0
         self.theBestSolution = currentState
+        self.currentEpoch = 0
         
     
     def updateTemp(self, epochs):
@@ -133,7 +133,7 @@ class SimulatedAnnealingAlgorithm():
             self.earlyStopCounters = 0
             self.currentPriority = newPriority
 
-        if temp < self.tempMin:
+        if temp < self.finalTemp:
             # print('temp < self.tempMin')
             return True
         
@@ -169,8 +169,12 @@ class SimulatedAnnealingAlgorithm():
         print('Class_PD:\n', parsePD(state, self.priorityMatrix))
         print('================================')
 
+    def getInfo(self):
+        return self.currentEpoch, self.temp
+
     def start(self, epochs):
         for i in range(epochs):
+            self.currentEpoch = i
             # print('===for epoch i: {0}==='.format(i))
             # print('temp run: ', self.temp)
             cnt = 0
@@ -187,7 +191,7 @@ class SimulatedAnnealingAlgorithm():
                 nxtState = self.getNextState(nextNeighbor)
                 # print('nxtState:\n',nxtState)
                 loss = self.lossFn(recentState, nxtState)
-                # print('loss:{:.10f}'.format(loss))
+                # print('loss:{:.1f}'.format(loss))
                 if loss <= 0:
                     # print('loss <= 0')
                     self.updateCurrentState(nxtState, nextNeighbor)

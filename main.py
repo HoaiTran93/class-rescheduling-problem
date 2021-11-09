@@ -51,7 +51,7 @@ def main():
     print('**************PHASE 2*****************')
     sa = SimulatedAnnealingAlgorithm(decision_matrix, tuple_neighbors, priority_matrix)
     solution = sa.start(500)
-    sa.toString(solution)
+    sa.toString(course, solution)
     print("End!!!")
 
 if __name__ == "__main__":

@@ -3,7 +3,7 @@ import numpy as np
 
 def object_function(pd_assignment):
     sum_priotity = 0
-    for item in pd_assignment['list_priority']:
+    for item in pd_assignment['Priority']:
         if item != 'n/a':
             sum_priotity += item
     return sum_priotity
@@ -102,5 +102,5 @@ def parsePD(decision_matrix, pd_priority_matrix):
             list_priority.append(priority)
     df = pd.DataFrame({'ClassID': list_classID,
                     'TeacherID': list_teacherID,
-                    'list_priority': list_priority})
+                    'Priority': list_priority})
     return df

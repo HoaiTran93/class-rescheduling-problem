@@ -50,9 +50,23 @@ class SimulatedAnnealingAlgorithm():
         tmpValue = state.drop(columns='Max_Classes')
         return tmpValue.values.sum()
     
-    # def getBasicClass(self, state):
-    #     tmpValue = state.drop(columns='Max_Classes')
-    #     return tmpValue.loc[tmpValue['a'] == 1, 'b'].sum()
+    def getBasicClass(self, pd_course, pd_result):
+        list_basic_class = []
+        for clssID in pd_course.index.tolist():
+            if pd_course.loc[clssID, 'Basic'] == 1:
+                list_basic_class.append(pd_course.loc[clssID, 'CourseID'])
+    
+        list_class_result = []
+        for clssID in pd_result.index.tolist():
+            if pd_result.loc[clssID, 'Priority'] != 'n/a':
+                list_class_result.append(pd_result.loc[clssID, 'ClassID'])
+
+        cnt = 0
+        for classOpen in list_class_result:
+            for classBasic in list_basic_class:
+                if classBasic in classOpen:
+                    cnt += 1
+        return cnt
 
     # def lossFn(self,currentState, nextState):
     #     print('lossFn called')
@@ -143,10 +157,11 @@ class SimulatedAnnealingAlgorithm():
         print('Class_PD:\n', parsePD(self.currentState, self.priorityMatrix))
         print('================================')
 
-    def toString(self, state):
+    def toString(self, course, state):
         print('==============Final Result==================')
         print('priority: ', object_function(parsePD(state, self.priorityMatrix)))
         print('num_class: ',self.getTotalClass(state))
+        print('num_class basic:', self.getBasicClass(course, parsePD(state, self.priorityMatrix)))
         print('Class_PD:\n', parsePD(state, self.priorityMatrix))
         print('================================')
 

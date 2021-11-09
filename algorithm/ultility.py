@@ -104,3 +104,9 @@ def parsePD(decision_matrix, pd_priority_matrix):
                     'TeacherID': list_teacherID,
                     'Priority': list_priority})
     return df
+
+def isValid(priority_matrix_result):
+    if len(priority_matrix_result.index.tolist()) == 0:
+        return False
+    else:
+        return True

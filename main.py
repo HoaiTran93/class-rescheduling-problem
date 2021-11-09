@@ -2,7 +2,7 @@ import sys
 import numpy as np
 import pandas as pd
 from preprocessing import MatrixPriority
-from algorithm import Hungarian, Assginments, SimulatedAnnealingAlgorithm, object_function, parsePD, get_neighbors
+from algorithm import Hungarian, Assginments, SimulatedAnnealingAlgorithm, object_function, parsePD, get_neighbors, isValid
 
 def main():
     print("Start!!!")
@@ -21,6 +21,10 @@ def main():
     mp = MatrixPriority(course, registration, teacher)
     priority_matrix = mp.generate()
     print(priority_matrix)
+
+    if not isValid(priority_matrix):
+        print("Priority matrix is not valid!!!")
+        return False
     #check if hungarian_algorithm can run
     ha = Hungarian(priority_matrix)
     if ha.hungarian_check():

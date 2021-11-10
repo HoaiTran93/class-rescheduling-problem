@@ -5,7 +5,7 @@ import pandas as pd
 from preprocessing import MatrixPriority
 from algorithm import Hungarian, Assginments, SimulatedAnnealingAlgorithm, object_function, parsePD, get_neighbors, isValid
 
-def parseOutput(id_method, course, solution, priority_matrix,  epochs='n/a', temp='n/a'):
+def parseOutput(dataPath, id_method, course, solution, priority_matrix,  epochs='n/a', temp='n/a'):
     priority = object_function(parsePD(solution, priority_matrix))
     num_class = getTotalClass(solution)
     num_class_basic = getBasicClass(course, parsePD(solution, priority_matrix))
@@ -26,7 +26,7 @@ def parseOutput(id_method, course, solution, priority_matrix,  epochs='n/a', tem
 
     df_output = parsePD(solution, priority_matrix)
     df_output = df_output.sort_values(by=['ClassID'], ignore_index=True)
-    with pd.ExcelWriter('output.xlsx') as writer:
+    with pd.ExcelWriter(dataPath + '/output.xlsx') as writer:
         df_info.to_excel(writer, sheet_name='Sheet1')
         df_output.to_excel(writer, sheet_name='Sheet1', startrow=8, startcol=0)
 
@@ -92,7 +92,7 @@ def main():
         print('Hungarian can run with this case!!!')
         decision_matrix_hungarian = ha.generate_decision_matrix()
         # print('result:\n',decision_matrix_hungarian)
-        return parseOutput(1, course, decision_matrix_hungarian, priority_matrix)
+        return parseOutput(dataPath, 1, course, decision_matrix_hungarian, priority_matrix)
     else:
         print('Hangarian can not run with this case!!!')
         print('Trigger Greedy Algorithm and Simulated Annealing Algorithm')
@@ -108,7 +108,7 @@ def main():
 
     if hl.isBestSolution(classToBeOpen):
         print('This is a best solution for this case!!!')
-        return parseOutput(2, course, decision_matrix, priority_matrix)
+        return parseOutput(dataPath, 2, course, decision_matrix, priority_matrix)
 
     print('init neighboor list: \n',tuple_neighbors)
 
@@ -118,7 +118,7 @@ def main():
     solution = sa.start(500)
     sa.toString(course, solution)
     epochs, tmp = sa.getInfo()
-    parseOutput(3, course, solution, priority_matrix, epochs, tmp)
+    parseOutput(dataPath, 3, course, solution, priority_matrix, epochs, tmp)
     print("End!!!")
 
 if __name__ == "__main__":

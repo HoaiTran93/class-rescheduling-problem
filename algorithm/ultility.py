@@ -110,3 +110,88 @@ def isValid(priority_matrix_result):
         return False
     else:
         return True
+
+def getTotalClass(state):
+    tmpValue = state.drop(columns='Max_Classes')
+    return tmpValue.values.sum()
+
+def getBasicClass(pd_course, pd_result):
+    list_basic_class = []
+    for clssID in pd_course.index.tolist():
+        if pd_course.loc[clssID, 'Basic'] == 1:
+            list_basic_class.append(pd_course.loc[clssID, 'CourseID'])
+
+    list_class_result = []
+    for clssID in pd_result.index.tolist():
+        if pd_result.loc[clssID, 'Priority'] != 'n/a':
+            list_class_result.append(pd_result.loc[clssID, 'ClassID'])
+
+    cnt = 0
+    for classOpen in list_class_result:
+        for classBasic in list_basic_class:
+            if classBasic in classOpen:
+                cnt += 1
+    return cnt
+
+def getBasicClassToBeOpen(course):
+        num_class = course['Basic']*course['No. Classes']
+        return num_class.sum()
+
+def parseOutput(dataPath, id_method, course, solution, priority_matrix,  epochs='n/a', temp='n/a', logNumClasses='n/a', logPriority='n/a'):
+    priority = object_function(parsePD(solution, priority_matrix))
+    num_class = getTotalClass(solution)
+    num_class_basic = getBasicClass(course, parsePD(solution, priority_matrix))
+    num_class_total = getBasicClassToBeOpen(course)
+
+    item_row = ['Epoch', 'Temp', 'Priority', 'Num Classes', 'Num Classes Basic', 'Method']
+    num_class_basic_merge = '{:.0f}/{:.0f}'.format(num_class_basic, num_class_total)
+    value_row = [epochs, temp, priority, num_class, num_class_basic_merge]
+
+    if id_method == 1:
+        value_row.append('Hungarian')
+    elif id_method == 2:
+        value_row.append('Greedy')
+    else:
+        value_row.append('Greedy + Simulated Annealing')
+
+    df_info = pd.DataFrame({'Item': item_row, 'Value': value_row})
+
+    df_output = parsePD(solution, priority_matrix)
+    df_output = df_output.sort_values(by=['ClassID'], ignore_index=True)
+    with pd.ExcelWriter(dataPath + '/output.xlsx') as writer:
+        df_info.to_excel(writer, sheet_name='Result')
+        df_output.to_excel(writer, sheet_name='Result', startrow=8, startcol=0)
+        if id_method == 3:
+            # Create a Pandas dataframe from the data.
+            multi_iter1 = {'NumClass': logNumClasses, 'Priority': logPriority}
+            df = pd.DataFrame(multi_iter1)
+            df.to_excel(writer, sheet_name='Result', startrow=1, startcol=8)
+
+            # Access the XlsxWriter workbook and worksheet objects from the dataframe.
+            workbook  = writer.book
+            worksheet = writer.sheets['Result']
+
+            # Create a chart object.
+            chart = workbook.add_chart({'type': 'line'})
+
+            # Configure the series of the chart from the dataframe data.
+            categories = ['NumClass', 'Priority']
+            for i in range(len(categories)):
+                col = i + 1 + 8
+                chart.add_series({
+                    'name':       ['Result', 1, col],
+                    'categories': ['Result', 2, 8,   2 + len(logNumClasses) - 1, 8],
+                    'values':     ['Result', 2, col, 2 + len(logNumClasses) - 1, col],
+                })
+            
+            # Configure the chart axes.
+            chart.set_x_axis({'name': 'Index', 'position_axis': 'on_tick'})
+            chart.set_y_axis({'name': 'Value', 'major_gridlines': {'visible': False}})
+
+            # Insert the chart into the worksheet.
+            worksheet.insert_chart('G2', chart)
+
+            # Close the Pandas Excel writer and output the Excel file.
+            # writer.save()
+            
+    print('Solution is ready at output.xlsx')

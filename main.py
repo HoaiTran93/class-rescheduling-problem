@@ -6,7 +6,6 @@ import pandas as pd
 from preprocessing import MatrixPriority
 from algorithm import Hungarian, Assginments, SimulatedAnnealingAlgorithm, object_function, parsePD, get_neighbors, isValid ,getTotalClass, getBasicClass, getBasicClassToBeOpen, parseOutput
 
-
 def main():
     print("Start!!!")
 

@@ -1,5 +1,8 @@
 import pandas as pd
 import numpy as np
+from datetime import datetime
+now = str(datetime.now().timestamp())
+timestamp = now.split('.')[0]
 
 def object_function(pd_assignment):
     sum_priotity = 0
@@ -158,7 +161,7 @@ def parseOutput(dataPath, id_method, course, solution, priority_matrix,  epochs=
 
     df_output = parsePD(solution, priority_matrix)
     df_output = df_output.sort_values(by=['ClassID'], ignore_index=True)
-    with pd.ExcelWriter(dataPath + '/output.xlsx') as writer:
+    with pd.ExcelWriter(dataPath + '/output_' + timestamp +'.xlsx') as writer:
         df_info.to_excel(writer, sheet_name='Result')
         df_output.to_excel(writer, sheet_name='Result', startrow=8, startcol=0)
         if id_method == 3:

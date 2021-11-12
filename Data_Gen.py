@@ -7,6 +7,8 @@ from datetime import date, datetime
 def gen_data(course_num, num_teacher, min_class, max_class, recruit_student, student_min_in_class, student_in_class, max_reg_a_class):
     file_suffix = str(course_num) + '-' + str(num_teacher)+ '-' + datetime.now().strftime('%H%M%S')
 
+    max_class = max_class if (min_class < max_class) else min_class + 1
+
     gen_teachers = [ {'TeacherID': 'T' + str(x+1).zfill(2), 'TeacherName':'Teacher '+ "{:02d}".format(x+1),'Max Classes':r.randrange(min_class, max_class)} for x in range(num_teacher)]
     gen_teachers = pd.DataFrame(gen_teachers)
     gen_teachers.to_csv('Teachers-' + file_suffix + '.csv')
@@ -20,8 +22,11 @@ def gen_data(course_num, num_teacher, min_class, max_class, recruit_student, stu
     for x in range(course_num):
         students_in_course = {}
         students_in_course['CourseID'] = 'C' + str(x).zfill(2)
-        
-        student_reg = r.randrange(0, max_reg_a_class)
+
+        #r0 = max_reg_a_class if (max_reg_a_class == student_in_class and student_in_class == student_min_in_class) else 0
+        r0 = 0
+
+        student_reg = max_reg_a_class if (max_reg_a_class == student_in_class and student_in_class == student_min_in_class) else r.randrange(r0, max_reg_a_class)
         student_reg = student_reg if (recruit_student - alloc_student) > student_reg else recruit_student - alloc_student
         students_in_course['No Students'] = student_reg if student_reg > 0 else 0
         alloc_student += student_reg
@@ -44,9 +49,11 @@ def gen_data(course_num, num_teacher, min_class, max_class, recruit_student, stu
     print(gen_classes)
     print('##############################################################')
 
-    teacher_class = {}
+    teacher_class = {}    
     for y in range(num_teacher):
-        teacher_class['T' + str(y + 1).zfill(2)] = list(range(1, gen_teachers.at[y, 'Max Classes'] + 1))
+        t = gen_teachers.at[y, 'Max Classes'] if (max_class != min_class + 1) else course_num
+        max_pref = r.randrange(t, course_num + 1) if (t < course_num) else course_num
+        teacher_class['T' + str(y + 1).zfill(2)] = list(range(1, max_pref + 1))
 
     full_registration = []
     assign_course_num = course_num
@@ -92,4 +99,4 @@ course_num = int(input('Enter total course school offer: '))
 num_teacher = int(input('Enter total of teachers school has: '))
 min_class = int(input('Enter minimum classes a teacher must teach in a week: '))
 max_class = int(input('Enter max classes a teacher must teach in a week: '))
-gen_data(course_num, num_teacher, min_class, max_class, recruit_student=200, student_min_in_class=15, student_in_class=30, max_reg_a_class=60)
+gen_data(course_num, num_teacher, min_class, max_class, recruit_student=360, student_min_in_class=15, student_in_class=30, max_reg_a_class=60)

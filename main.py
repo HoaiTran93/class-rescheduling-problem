@@ -55,6 +55,7 @@ def main():
         return parseOutput(dataPath, 2, course, decision_matrix, priority_matrix)
     else:
         print('Triggered Simulated Annealing Algorithm')
+        print(pd_assignment)
 
     #phase 2
     print('**************PHASE 2*****************')

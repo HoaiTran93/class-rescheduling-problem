@@ -140,15 +140,21 @@ def getBasicClassToBeOpen(course):
         num_class = course['Basic']*course['No. Classes']
         return num_class.sum()
 
+def getClassToBeOpen(course):
+    num_class = course['No. Classes']
+    return num_class.sum()
+
 def parseOutput(dataPath, id_method, course, solution, priority_matrix,  epochs='n/a', temp='n/a', logNumClasses='n/a', logPriority='n/a'):
     priority = object_function(parsePD(solution, priority_matrix))
     num_class = getTotalClass(solution)
     num_class_basic = getBasicClass(course, parsePD(solution, priority_matrix))
-    num_class_total = getBasicClassToBeOpen(course)
+    num_class_basic_total = getBasicClassToBeOpen(course)
+    num_class_open_total  = getClassToBeOpen(course)
 
     item_row = ['Epoch', 'Temp', 'Priority', 'Num Classes', 'Num Classes Basic', 'Method']
-    num_class_basic_merge = '{:.0f}/{:.0f}'.format(num_class_basic, num_class_total)
-    value_row = [epochs, temp, priority, num_class, num_class_basic_merge]
+    num_class_basic_merge = '{:.0f}/{:.0f}'.format(num_class_basic, num_class_basic_total)
+    num_class_open = '{:.0f}/{:.0f}'.format(num_class, num_class_open_total)
+    value_row = [epochs, temp, priority, num_class_open, num_class_basic_merge]
 
     if id_method == 1:
         value_row.append('Hungarian')
